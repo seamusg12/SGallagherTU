@@ -9,13 +9,15 @@
 #define YES 1
 #define NO 0
 
+/*
 enum alogithms {EULER, RK2, RK4};
+*/
 
 char *prog;
 
 int
 main(int argc, char *argv[]){
-  double r0, f0, ro, p[MAXPAR], tmax, t, dt, r[MAXORD];
+  double r0, f0, ro, p[MAXPAR], tmax, t, dt, r[MAXORD], rab;
   void euler(int, double*, double, double, double*);
   void rk2(int, double*, double, double, double*);
   void rk4(int, double*, double, double, double*);
@@ -25,6 +27,7 @@ main(int argc, char *argv[]){
   FILE *fpFox;
   FILE *fpTau;
 
+  nsteps = 1000;
   prog = argv[0];
 
   printf("Welcome to the rabbit/fox population simulator.\n\n");
@@ -41,8 +44,7 @@ main(int argc, char *argv[]){
   printf("\nAlgorithm to be used (1 = euler, 2 = rk2, 3 = rk4):\n");
   scanf("%d", &al);
 
-
-
+/*
   if(al == 1){
     al = EULER;
   }
@@ -52,6 +54,7 @@ main(int argc, char *argv[]){
   else if(al == 3){
     al = RK4;
   }
+*/
 
   printf("\nMax time:\n");
   scanf("%le", &tmax);
@@ -63,19 +66,19 @@ main(int argc, char *argv[]){
   dt = tmax/nsteps;
   t = 0.0;
 
-  if ((fpRab=fopen("rab.dat", "w+")) == NULL){
+  if ((fpRab=fopen("rab.txt", "w+")) == NULL){
     fprintf(stderr, "%s: Cant't open rab.dat for writing ", prog);
     perror("because");
     return 2;
   }
 
-  if ((fpFox=fopen("fox.dat", "w+")) == NULL){
+  if ((fpFox=fopen("fox.txt", "w+")) == NULL){
     fprintf(stderr, "%s: Cant't open fox.dat for writing ", prog);
     perror("because");
     return 2;
   }
 
-  if ((fpTau=fopen("tau.dat", "w+")) == NULL){
+  if ((fpTau=fopen("tau.txt", "w+")) == NULL){
     fprintf(stderr, "%s: Cant't open tau.dat for writing ", prog);
     perror("because");
     return 2;
@@ -89,6 +92,8 @@ main(int argc, char *argv[]){
     /*
     * advance solution from t --> t+dt:
     */
+
+/*
     switch (al) {
 
       case EULER:
@@ -109,10 +114,23 @@ main(int argc, char *argv[]){
       break;
 
     }
+*/
 
-    fprintf(fpRab, "%le", r[0]);
-    fprintf(fpFox, "%le", r[1]);
-    fprintf(fpTau, "%le", t);
+
+    if(al == 1){
+      euler(2, r, t, dt, p);
+    } else if(al == 2){
+      rk2(2, r, t, dt, p);
+    } else if(al == 3){
+      rk4(2, r, t, dt, p);
+    } else{
+      fprintf(stderr, "%s: invalid algorithm?\n", prog);
+      return 5;
+    }
+
+    fprintf(fpRab, "%le\n", r[0]);
+    fprintf(fpFox, "%le\n", r[1]);
+    fprintf(fpTau, "%le\n", t);
 
     t += dt;
 

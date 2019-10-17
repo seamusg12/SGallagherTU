@@ -21,38 +21,40 @@ main(int argc, char *argv[]){
   void rk4(int, double*, double, double, double*);
   int n, nsteps;
   int al;
+  FILE *fpRab;
+  FILE *fpFox;
+  FILE *fpTau;
 
   prog = argv[0];
-
-
 
   printf("Welcome to the rabbit/fox population simulator.\n\n");
 
   printf("\nRatio of initial rabbit population density to critical population density:\n");
-  scanf("%le", r0);
+  scanf("%le", &r0);
 
   printf("\nRatio of initial fox population density to critical population density:\n");
-  scanf("%le", f0);
+  scanf("%le", &f0);
 
   printf("\nRatio of fox starvation rate to rabbit growth rate:\n");
-  scanf("%le", p);
+  scanf("%le", &ro);
 
-  printf("\nAlgorithm to be used (euler, rk2, rk4):\n");
-  scanf("%s", al);
+  printf("\nAlgorithm to be used (1 = euler, 2 = rk2, 3 = rk4):\n");
+  scanf("%d", &al);
 
-  if(al == "rk2"){
-    al = RK2;
-  }
-  else if(al == "rk4"){
-    al = RK4;
-  }
-  else if(al == "euler"){
+
+
+  if(al == 1){
     al = EULER;
   }
+  else if(al == 2){
+    al = RK2;
+  }
+  else if(al == 3){
+    al = RK4;
+  }
 
-
-  printf("\nMax time:\n")
-  scanf("%le", tmax);
+  printf("\nMax time:\n");
+  scanf("%le", &tmax);
 
   r[0] = r0; // initial rabbit density to critical density ratio
   r[1] = f0; // initial fox density to critical density ratio
@@ -60,6 +62,25 @@ main(int argc, char *argv[]){
 
   dt = tmax/nsteps;
   t = 0.0;
+
+  if ((fpRab=fopen("rab.dat", "w+")) == NULL){
+    fprintf(stderr, "%s: Cant't open rab.dat for writing ", prog);
+    perror("because");
+    return 2;
+  }
+
+  if ((fpFox=fopen("fox.dat", "w+")) == NULL){
+    fprintf(stderr, "%s: Cant't open fox.dat for writing ", prog);
+    perror("because");
+    return 2;
+  }
+
+  if ((fpTau=fopen("tau.dat", "w+")) == NULL){
+    fprintf(stderr, "%s: Cant't open tau.dat for writing ", prog);
+    perror("because");
+    return 2;
+  }
+
 
   for (n = 0; n < nsteps; n++) {  // N.B.: start counting at n=0 so that ...
 
@@ -89,8 +110,11 @@ main(int argc, char *argv[]){
 
     }
 
-    t += dt;
+    fprintf(fpRab, "%le", r[0]);
+    fprintf(fpFox, "%le", r[1]);
+    fprintf(fpTau, "%le", t);
 
+    t += dt;
 
   }
 
